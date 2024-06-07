@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:quizz_game/level_screen.dart';
+import 'package:quizz_game/models/quiz_question.dart';
 
 import 'package:quizz_game/start_screen.dart';
 import 'package:quizz_game/questions_screen.dart';
-import 'package:quizz_game/data/questions.dart';
 import 'package:quizz_game/results_screen.dart';
 
 class Quiz extends StatefulWidget {
@@ -15,19 +16,29 @@ class Quiz extends StatefulWidget {
 }
 
 class _QuizState extends State<Quiz> {
-  List<String> _selectedAnswers = [];
+  List<QuizQuestion> _quizzQuestions = [];
+
+  String level = "1";
   var _activeScreen = 'start-screen';
 
   void _switchScreen() {
+    setState(() {
+      _activeScreen = 'select-level';
+    });
+  }
+
+  void _selectLevel(String level){
+    this.level = level;
+
     setState(() {
       _activeScreen = 'questions-screen';
     });
   }
 
-  void _chooseAnswer(String answer) {
-    _selectedAnswers.add(answer);
+  void _chooseAnswer(QuizQuestion quizzQuestion) {
+    _quizzQuestions.add(quizzQuestion);
 
-    if (_selectedAnswers.length == questions.length) {
+    if (_quizzQuestions.length == 5) {
       setState(() {
         _activeScreen = 'results-screen';
       });
@@ -36,8 +47,8 @@ class _QuizState extends State<Quiz> {
 
   void restartQuiz() {
     setState(() {
-      _selectedAnswers = [];
-      _activeScreen = 'questions-screen';
+      _quizzQuestions = [];
+      _activeScreen = 'select-level';
     });
   }
 
@@ -47,14 +58,23 @@ class _QuizState extends State<Quiz> {
 
     if (_activeScreen == 'questions-screen') {
       screenWidget = QuestionsScreen(
+        level: level,
         onSelectAnswer: _chooseAnswer,
+      );
+    }
+
+    if (_activeScreen == 'select-level') {
+      screenWidget = LevelScreen(
+        onSelectLevel: _selectLevel,
       );
     }
 
     if (_activeScreen == 'results-screen') {
       screenWidget = ResultsScreen(
-        chosenAnswers: _selectedAnswers,
+        level: level,
+        quizzQuestions: _quizzQuestions,
         onRestart: restartQuiz,
+
       );
     }
 

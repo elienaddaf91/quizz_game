@@ -1,29 +1,32 @@
 import 'package:flutter/material.dart';
 
-import 'package:quizz_game/data/questions.dart';
+import 'package:quizz_game/models/quiz_question.dart';
 import 'package:quizz_game/questions_summary/questions_summary.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class ResultsScreen extends StatelessWidget {
   const ResultsScreen({
     super.key,
-    required this.chosenAnswers,
+    required this.level,
+    required this.quizzQuestions,
     required this.onRestart,
   });
 
   final void Function() onRestart;
-  final List<String> chosenAnswers;
+  final List<QuizQuestion> quizzQuestions;
+  final String level;
 
   List<Map<String, Object>> get summaryData {
     final List<Map<String, Object>> summary = [];
 
-    for (var i = 0; i < chosenAnswers.length; i++) {
+    for (var i = 0; i < quizzQuestions.length; i++) {
+
       summary.add(
         {
           'question_index': i,
-          'question': questions[i].text,
-          'correct_answer': questions[i].answers[0],
-          'user_answer': chosenAnswers[i]
+          'question': quizzQuestions[i].text,
+          'correct_answer': quizzQuestions[i].correctAnswer,
+          'user_answer': quizzQuestions[i].userAnswer as Object
         },
       );
     }
@@ -33,7 +36,7 @@ class ResultsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final numTotalQuestions = questions.length;
+    final numTotalQuestions = quizzQuestions.length;
     final numCorrectQuestions = summaryData
         .where(
           (data) => data['user_answer'] == data['correct_answer'],
